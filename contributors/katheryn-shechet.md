@@ -6,7 +6,7 @@ Katheryn Shechet is an economist with experience in data analysis, research, pro
 ## Experience
 - **Current Position:** Independent researcher and author.
 - **Past Experience:**
-  - Extensive experience in research and data analysis roles.
+  - Research and data analysis.
   - Background in project coordination, management, catering, and event coordination.
 
 ## Skills
