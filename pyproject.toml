@@ -1,25 +1,21 @@
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "DiscoAnalytica"
 version = "0.1.0"
 description = "A collaborative music analysis project exploring lyrical sentiment, genre trends, and societal correlations."
+readme = "README.md"
 authors = [
     { name = "Katheryn M. Shechet", email = "ktmtta@gmail.com" },
     { name = "Patrick R Shechet", email = "patrick.shechet@gmail.com" }
 ]
 license = { text = "MIT" }
+requires-python = ">=3.13"
 dependencies = [
-    "spacy",
-    "duckdb"
+    "duckdb>=1.2.0",
 ]
 
-[tool.setuptools]
-packages = ["discoanalytica"]
+[project.scripts]
+discoanalytica = "discoanalytica:main"
 
-[project.optional-dependencies]
-dev = [
-    "black"
-]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
