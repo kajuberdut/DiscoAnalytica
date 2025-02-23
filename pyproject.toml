@@ -1,5 +1,5 @@
 [project]
-name = "DiscoAnalytica"
+name = "discoanalytica"
 version = "0.1.0"
 description = "A collaborative music analysis project exploring lyrical sentiment, genre trends, and societal correlations."
 readme = "README.md"
@@ -11,11 +11,21 @@ license = { text = "MIT" }
 requires-python = ">=3.13"
 dependencies = [
     "duckdb>=1.2.0",
+    "kagglehub>=0.3.9",
+    "platformdirs>=4.3.6",
 ]
 
 [project.scripts]
 discoanalytica = "discoanalytica:main"
+disco_hash = "discoanalytica.file_hash:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/discoanalytica"]
+include = [
+    "discoanalytica/data_sources/*.json",
+    "discoanalytica/sql/*.sql"
+]
