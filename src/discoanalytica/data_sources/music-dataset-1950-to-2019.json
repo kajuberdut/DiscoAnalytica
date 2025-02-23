@@ -1,0 +1,10 @@
+{
+  "id": "saurabhshahane/music-dataset-1950-to-2019",
+  "provider": "Kaggle",
+  "url": "https://www.kaggle.com/datasets/saurabhshahane/music-dataset-1950-to-2019/data",
+  "source_type": "csv",
+  "license": "Attribution 4.0 International (CC BY 4.0)",
+  "attribution": "This dataset is provided by Saurabh Shahane on Kaggle. Please check the original source for licensing and usage terms.",
+  "hash": "046b8e714bb037b5960429a9a4bdfc205530c81e0617ef39a328307c9f9e1173",
+  "filename": "tcc_ceds_music.csv"
+}
