@@ -1,30 +1,31 @@
 import argparse
-from pathlib import Path
 
-from . import manage_data
+from discoanalytica.data import process_data_definition
+from discoanalytica.models.database import DB_PATH, clear_db
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        prog="discoanalytica", description="DiscoAnalytica CLI tool"
-    )
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    parser = argparse.ArgumentParser(description="DiscoAnalytica CLI")
 
-    # Subcommand 'add'
-    data_parser = subparsers.add_parser(
-        "add", help="Compress a CSV file using LZMA and generate an attribution.json"
-    )
-    data_parser.add_argument("input_csv", type=Path, help="Path to the input CSV file")
-    data_parser.add_argument(
-        "--output-dir",
-        type=Path,
-        default=Path().cwd,
-        help="Output directory (default: current directory)",
-    )
-    data_parser.set_defaults(func=manage_data.main)
+    subparsers = parser.add_subparsers(dest="command", help="Sub-commands")
+
+    loader_parser = subparsers.add_parser("loader", help="Run the data loader")
+    info_parser = subparsers.add_parser("info", help="Show info about config.")
+
+    parser.add_argument("--clear-db", action="store_true", help="Clear the database")
 
     args = parser.parse_args()
-    args.func(args)
+
+    if args.clear_db:
+        clear_db()
+
+    if args.command == "loader":
+        process_data_definition()
+    elif args.command == "info":
+        print(f"{DB_PATH=}")
+    else:
+        print("Hello, this is the main entrypoint of discoanalytica")
+        print("Currently there is no functionality here.")
 
 
 if __name__ == "__main__":
