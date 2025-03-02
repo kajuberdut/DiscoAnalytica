@@ -1,4 +1,4 @@
-class DataSourceError(Exception):
+class DataDefinitionError(Exception):
     """Custom exception for data source errors."""
 
     pass

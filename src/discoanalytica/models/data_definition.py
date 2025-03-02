@@ -7,11 +7,11 @@ from typing import Type, TypeVar, Union
 from discoanalytica.file_hash import check_file_hash
 
 
-class Provider(Enum):
+class DataProvider(Enum):
     KAGGLE = 1
 
 
-class SourceType(Enum):
+class DataFileType(Enum):
     CSV = 1
     PARQUET = 2
     JSON = 3
@@ -30,12 +30,12 @@ def coerce_enum(enum_type: Type[T], value: str | T) -> T:
 
 
 @dataclass
-class DataSource:
+class DataDefinition:
     name: str
     external_id: Union[str, int]
-    provider: Provider
+    provider: DataProvider
     url: str
-    source_type: SourceType
+    file_type: DataFileType
     license: str
     attribution: str
     hash: str
@@ -43,8 +43,8 @@ class DataSource:
     _file_path: Path = field(default=None, repr=False)
 
     def __post_init__(self):
-        self.provider = coerce_enum(Provider, self.provider.upper())
-        self.source_type = coerce_enum(SourceType, self.source_type.upper())
+        self.provider = coerce_enum(DataProvider, self.provider.upper())
+        self.file_type = coerce_enum(DataFileType, self.file_type.upper())
 
     @property
     def file_path(self) -> Path:
@@ -81,15 +81,56 @@ class DataSource:
         return check_file_hash(self.file_path, self.hash)
 
     @classmethod
-    def from_json_file(cls, json_file: Path) -> "DataSource":
+    def from_json_file(cls, json_file: Path) -> "DataDefinition":
         """
-        Load a DataSource instance from a JSON file.
+        Load a DataDefinition instance from a JSON file.
 
         Args:
             json_file (Path): The path to the JSON file.
 
         Returns:
-            DataSource: The loaded DataSource instance.
+            DataDefinition: The loaded DataDefinition instance.
         """
         data = json.loads(json_file.read_text(encoding="utf-8"))
         return cls(**data, **{"name": json_file.stem})
+
+    def insert_into_db(self, conn) -> int:
+        """
+        Insert this DataDefinition instance into the data_definitions table using the provided DuckDB connection
+        and return the generated data_definition_id.
+
+        Args:
+            conn: A DuckDB connection.
+
+        Returns:
+            int: The auto-generated data_definition_id from the insert.
+        """
+        query = """
+        INSERT INTO data_definitions (
+              name
+            , external_id
+            , provider_id
+            , url
+            , data_file_type_id
+            , license
+            , attribution
+            , hash
+            , filename
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        RETURNING data_definition_id
+        """
+        params = (
+            self.name,
+            self.external_id,
+            self.provider.value,
+            self.url,
+            self.file_type.value,
+            self.license,
+            self.attribution,
+            self.hash,
+            self.filename,
+        )
+        cursor = conn.execute(query, params)
+        data_definition_id = cursor.fetchone()[0]
+        return data_definition_id

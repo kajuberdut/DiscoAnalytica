@@ -3,7 +3,7 @@ import hashlib
 from pathlib import Path
 
 
-def compute_file_hash(file_path: Path, algorithm: str = 'sha256') -> str:
+def compute_file_hash(file_path: Path, algorithm: str = "sha256") -> str:
     """
     Compute the hash of the file at file_path using the specified hash algorithm.
 
@@ -19,7 +19,10 @@ def compute_file_hash(file_path: Path, algorithm: str = 'sha256') -> str:
     hash_func.update(file_bytes)
     return hash_func.hexdigest()
 
-def check_file_hash(file_path: Path, expected_hash: str, algorithm: str = 'sha256') -> bool:
+
+def check_file_hash(
+    file_path: Path, expected_hash: str, algorithm: str = "sha256"
+) -> bool:
     """
     Check if the hash of the file at file_path matches the expected hash.
 
@@ -34,23 +37,18 @@ def check_file_hash(file_path: Path, expected_hash: str, algorithm: str = 'sha25
     computed_hash = compute_file_hash(file_path, algorithm)
     return computed_hash == expected_hash
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Compute or verify a file hash using built-in Python libraries."
     )
+    parser.add_argument("file", type=Path, help="Path to the file to hash")
     parser.add_argument(
-        "file", 
-        type=Path, 
-        help="Path to the file to hash"
+        "--algorithm", default="sha256", help="Hash algorithm to use (default: sha256)"
     )
     parser.add_argument(
-        "--algorithm", 
-        default="sha256", 
-        help="Hash algorithm to use (default: sha256)"
-    )
-    parser.add_argument(
-        "--expected", 
-        help="Expected hash value. If provided, the file's hash is compared to this value."
+        "--expected",
+        help="Expected hash value. If provided, the file's hash is compared to this value.",
     )
     args = parser.parse_args()
 
@@ -70,6 +68,7 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         exit(1)
+
 
 if __name__ == "__main__":
     main()
