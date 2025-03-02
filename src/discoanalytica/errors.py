@@ -3,7 +3,14 @@ class DataDefinitionError(Exception):
 
     pass
 
+
 class BadHashError(Exception):
     """Custom exception for failed hash match."""
+
+    pass
+
+
+class UnknownOperation(Exception):
+    """Custom Exception for unrecognized operation in a data pipeline."""
 
     pass

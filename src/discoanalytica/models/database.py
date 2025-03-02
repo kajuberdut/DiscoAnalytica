@@ -39,6 +39,7 @@ class Database:
             self._confirm_base_tables_exist()
         return self._conn
 
+
     def _confirm_base_tables_exist(self) -> None:
         """
         Checks if the required base tables exist. If not, it loads and executes the
@@ -48,17 +49,18 @@ class Database:
         SELECT COUNT(*) = 6
         FROM INFORMATION_SCHEMA.TABLES
         WHERE table_name IN (
-            'table_type'
-          , 'DataProvider'
-          , 'data_definition_type'
-          , 'data_definitions'
-          , 'table_info'
+            'data_definitions'
+          , 'data_file_type'
           , 'data_log'
+          , 'data_provider'
+          , 'table_info'
+          , 'table_type'
         );
         """
         self._conn.execute(BASE_CHECK)
         result = self._conn.fetchone()
         if not result[0]:
+            print("Base tables not found, creating.")
             with resource_path("discoanalytica.sql", "base_tables.sql") as sql_path:
                 base_sql = sql_path.read_text("utf-8")
                 self._conn.execute(base_sql)

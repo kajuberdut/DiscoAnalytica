@@ -6,14 +6,14 @@ CREATE TABLE IF NOT EXISTS table_type (
 
 -- Insert predefined table types
 INSERT OR IGNORE INTO table_type (type_id, name) VALUES
-      (1, 'Entity Tables')
-    , (2, 'Lookup Tables')
-    , (3, 'Extended Data Tables')
-    , (4, 'Feature Tables')
-    , (5, 'Junction Tables')
-    , (6, 'Log Tables')
-    , (7, 'Staging Tables')
-    , (8, 'Archive Tables')
+      (1, 'Entity Table')
+    , (2, 'Lookup Table')
+    , (3, 'Extended Data Table')
+    , (4, 'Feature Table')
+    , (5, 'Junction Table')
+    , (6, 'Log Table')
+    , (7, 'Staging Table')
+    , (8, 'Archive Table')
 ;
 
 -- Create data_provider table to store data providers
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS data_provider (
 );
 
 -- Insert predefined data providers
-INSERT OR IGNORE INTO provider (provider_id, name) VALUES
+INSERT OR IGNORE INTO data_provider (provider_id, name) VALUES
     (1, 'Kaggle')
 ;
 
@@ -65,22 +65,21 @@ CREATE TABLE IF NOT EXISTS table_info (
       table_info_id INTEGER PRIMARY KEY DEFAULT nextval('seq_table_info_id')
     , table_name TEXT UNIQUE
     , type_id INTEGER NOT NULL
-    , description TEXT
     , created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     , FOREIGN KEY (type_id) REFERENCES table_type(type_id)
 );
 
 
 -- Create a log table for data loads
-CREATE SEQUENCE seq_data_log_id START 1;
+CREATE SEQUENCE IF NOT EXISTS seq_data_log_id START 1;
 
 CREATE TABLE data_log (
       data_log_id INTEGER PRIMARY KEY DEFAULT nextval('seq_data_log_id')
     , data_load_session_id UUID
     , table_info_id INTEGER REFERENCES table_info(table_info_id)
     , data_definition_id INTEGER REFERENCES data_definitions(data_definition_id)
-    , load_start_time TIMESTAMP_MS
-    , load_end_time TIMESTAMP_MS
+    , load_start_time TIMESTAMP
+    , load_end_time TIMESTAMP
     , rows_affected INTEGER
 );
 

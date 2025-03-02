@@ -1,15 +1,15 @@
 from importlib.resources import as_file, files
 from typing import Callable, Dict
 
+from discoanalytica.data.file_types.csv import import_csv
+from discoanalytica.data.pipeline import process_data_pipeline
+from discoanalytica.data.providers.kaggle import kaggle_download
 from discoanalytica.errors import DataDefinitionError
 from discoanalytica.models.data_definition import (
     DataDefinition,
     DataFileType,
     DataProvider,
 )
-from discoanalytica.data.providers.kaggle import kaggle_download
-from discoanalytica.data.file_types.csv import import_csv
-
 
 PROVIDER_HANDLERS: Dict[DataProvider, Callable[[DataDefinition], None]] = {
     DataProvider.KAGGLE: kaggle_download,
@@ -81,9 +81,8 @@ def pick_data_definition() -> DataDefinition:
     return data_definition
 
 
-if __name__ == "__main__":
-    try:
-        data_definition = pick_data_definition()
-        print(f"Data definition: {data_definition}")
-    except DataDefinitionError as e:
-        print(f"Error: {e}")
+def process_data_definition():
+    data_definition = pick_data_definition()
+    process_provider(data_definition)
+    process_file(data_definition)
+    process_data_pipeline(data_definition)

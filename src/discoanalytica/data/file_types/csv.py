@@ -2,6 +2,7 @@ import csv
 from pathlib import Path
 
 from discoanalytica.models.data_definition import DataDefinition
+from discoanalytica.models.database import Database
 
 
 def create_preview_csv(data_definition: DataDefinition, output_dir: Path):
@@ -20,11 +21,13 @@ def create_preview_csv(data_definition: DataDefinition, output_dir: Path):
     return preview_file
 
 
-def import_csv(conn, data_definition: DataDefinition) -> None:
+def import_csv(data_definition: DataDefinition) -> None:
+    raw_table_name = data_definition.name.replace("-", "_")
     load_csv_sql = f"""
-    CREATE TABLE {data_definition.name} AS
+    CREATE TABLE {raw_table_name} AS
     SELECT *
     FROM read_csv_auto('{data_definition.file_path}', header=True)
     ;
     """
-    conn.execute(load_csv_sql)
+    with Database() as db:
+        db.execute(load_csv_sql)

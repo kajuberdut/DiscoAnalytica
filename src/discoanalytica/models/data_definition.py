@@ -40,7 +40,10 @@ class DataDefinition:
     attribution: str
     hash: str
     filename: str
+    data_pipeline: list
+    data_definition_id: int = field(default=None)
     _file_path: Path = field(default=None, repr=False)
+    
 
     def __post_init__(self):
         self.provider = coerce_enum(DataProvider, self.provider.upper())
@@ -111,7 +114,7 @@ class DataDefinition:
             , external_id
             , provider_id
             , url
-            , data_file_type_id
+            , file_type_id
             , license
             , attribution
             , hash
@@ -133,4 +136,4 @@ class DataDefinition:
         )
         cursor = conn.execute(query, params)
         data_definition_id = cursor.fetchone()[0]
-        return data_definition_id
+        self.data_definition_id = data_definition_id
