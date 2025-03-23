@@ -1,0 +1,164 @@
+license: "Attribution 4.0 International (CC BY 4.0)"
+attribution: "This dataset is provided by Saurabh Shahane on Kaggle. Please check the original source for licensing and usage terms."
+steps:
+  - type: fetch.kaggle
+    url: "https://www.kaggle.com/datasets/saurabhshahane/music-dataset-1950-to-2019/data"
+    id: saurabhshahane/music-dataset-1950-to-2019
+  - type: validate.hash
+    hashes:
+      tcc_ceds_music.csv: "046b8e714bb037b5960429a9a4bdfc205530c81e0617ef39a328307c9f9e1173"
+  - type: session.get_id
+  - type: metadata.data_definition
+  - type: csv.import
+  - type: sql.sequence
+    name: seq_artist_id
+  - type: sql.table
+    name: artists
+    table_type: Lookup Table
+    sql: |
+      CREATE TABLE IF NOT EXISTS artists (
+          artist_id INTEGER PRIMARY KEY DEFAULT nextval('seq_artist_id')
+        , artist_name VARCHAR NOT NULL UNIQUE
+      );
+  - type: sql.insert
+    table: artists
+    sql: |
+      INSERT OR IGNORE INTO artists (artist_name)
+      SELECT DISTINCT artist_name
+      FROM music_dataset_1950_to_2019
+      ;
+  - type: sql.sequence
+    name: seq_genres_id
+  - type: sql.table
+    name: genres
+    table_type: Lookup Table
+    sql: |
+      CREATE TABLE IF NOT EXISTS genres (
+          genre_id INTEGER PRIMARY KEY DEFAULT nextval('seq_genres_id')
+        , genre VARCHAR NOT NULL UNIQUE
+      );
+  - type: sql.insert
+    table: genres
+    sql: |
+      INSERT OR IGNORE INTO genres (genre)
+      SELECT DISTINCT genre
+      FROM music_dataset_1950_to_2019
+      ;
+  - type: sql.sequence
+    name: seq_topic_id
+  - type: sql.table
+    name: topics
+    table_type: Lookup Table
+    sql: |
+      CREATE TABLE IF NOT EXISTS topics (
+          topic_id INTEGER PRIMARY KEY DEFAULT nextval('seq_topic_id')
+        , topic_name VARCHAR NOT NULL UNIQUE
+      );
+  - type: sql.insert
+    table: topics
+    sql: |
+      INSERT OR IGNORE INTO topics (topic_name)
+      SELECT DISTINCT topic
+      FROM music_dataset_1950_to_2019
+      ;
+  - type: sql.table
+    name: tracks
+    table_type: Entity Table
+    sql: |
+      CREATE TABLE IF NOT EXISTS tracks (
+          track_id INTEGER PRIMARY KEY
+        , artist_id INTEGER REFERENCES artists(artist_id)
+        , genre_id INTEGER REFERENCES genres(genre_id)
+        , topic_id INTEGER REFERENCES topics(topic_id)
+        , track_name VARCHAR NOT NULL
+        , release_date INTEGER
+        , len INTEGER
+      );
+  - type: sql.insert
+    table: tracks
+    sql: |
+      INSERT OR IGNORE INTO tracks (track_id, artist_id, genre_id, topic_id, track_name, release_date, len)
+      SELECT column00
+        , (SELECT artist_id FROM artists WHERE artist_name = r.artist_name)
+        , (SELECT genre_id FROM genres g WHERE g.genre = r.genre)
+        , (SELECT topic_id FROM topics WHERE topic_name = r.topic)
+        , r.track_name
+        , CAST(r.release_date AS INTEGER)
+        , r.len
+      FROM music_dataset_1950_to_2019 r
+      ;
+  - type: sql.table
+    name: track_features
+    table_type: Feature Table
+    sql: |
+      CREATE TABLE IF NOT EXISTS track_features (
+        track_id INTEGER PRIMARY KEY REFERENCES tracks(track_id),
+        dating FLOAT,
+        violence FLOAT,
+        world_life FLOAT,            -- from "world/life"
+        night_time FLOAT,            -- from "night/time"
+        shake_the_audience FLOAT,    -- from "shake the audience"
+        family_gospel FLOAT,         -- from "family/gospel"
+        romantic FLOAT,
+        communication FLOAT,
+        obscene FLOAT,
+        music FLOAT,
+        movement_places FLOAT,       -- from "movement/places"
+        light_visual_perceptions FLOAT,  -- from "light/visual perceptions"
+        family_spiritual FLOAT,      -- from "family/spiritual"
+        like_girls FLOAT,            -- from "like/girls"
+        sadness FLOAT,
+        feelings FLOAT,
+        danceability FLOAT,
+        loudness FLOAT,
+        acousticness FLOAT,
+        instrumentalness FLOAT,
+        valence FLOAT,
+        energy FLOAT
+      );
+  - type: sql.insert
+    table: track_features
+    sql: |
+      INSERT OR IGNORE INTO track_features (track_id, dating, violence, world_life, night_time, shake_the_audience, family_gospel, romantic, communication, obscene, music, movement_places, light_visual_perceptions, family_spiritual, like_girls, sadness, feelings, danceability, loudness, acousticness, instrumentalness, valence, energy)
+      SELECT
+          r.column00
+        , r.dating
+        , r.violence
+        , r."world/life"
+        , r."night/time"
+        , r."shake the audience"
+        , r."family/gospel"
+        , r.romantic
+        , r.communication
+        , r.obscene
+        , r.music
+        , r."movement/places"
+        , r."light/visual perceptions"
+        , r."family/spiritual"
+        , r."like/girls"
+        , r.sadness
+        , r.feelings
+        , r.danceability
+        , r.loudness
+        , r.acousticness
+        , r.instrumentalness
+        , r.valence
+        , r.energy
+      FROM music_dataset_1950_to_2019 r
+      ;
+  - type: sql.table
+    name: lyrics
+    table_type: Extended Data Table
+    sql: |
+      CREATE TABLE IF NOT EXISTS lyrics(
+          track_id INTEGER PRIMARY KEY REFERENCES tracks(track_id)
+        , lyrics TEXT
+        , hash TEXT UNIQUE
+      );
+  - type: sql.insert
+    table: lyrics
+    sql: |
+      INSERT OR IGNORE INTO lyrics(track_id, lyrics, hash)
+      SELECT column00, lyrics, sha256(lyrics)
+      FROM music_dataset_1950_to_2019
+      ;

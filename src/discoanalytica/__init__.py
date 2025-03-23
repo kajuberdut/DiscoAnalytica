@@ -1,7 +1,7 @@
 import argparse
 
-from discoanalytica.data import process_data_definition
-from discoanalytica.models.database import DB_PATH, clear_db
+from discoanalytica.data_definition import pick_data_definition
+from discoanalytica.database import DB_PATH, clear_db
 
 
 def main():
@@ -9,8 +9,8 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", help="Sub-commands")
 
-    loader_parser = subparsers.add_parser("loader", help="Run the data loader")
-    info_parser = subparsers.add_parser("info", help="Show info about config.")
+    subparsers.add_parser("loader", help="Run the data loader")
+    subparsers.add_parser("info", help="Show info about config.")
 
     parser.add_argument("--clear-db", action="store_true", help="Clear the database")
 
@@ -20,12 +20,17 @@ def main():
         clear_db()
 
     if args.command == "loader":
-        process_data_definition()
+        loader_manager()
     elif args.command == "info":
         print(f"{DB_PATH=}")
     else:
         print("Hello, this is the main entrypoint of discoanalytica")
         print("Currently there is no functionality here.")
+
+
+def loader_manager():
+    data_definition = pick_data_definition()
+    data_definition.process_steps()
 
 
 if __name__ == "__main__":

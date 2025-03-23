@@ -9,8 +9,6 @@ class BadHashError(Exception):
 
     pass
 
-
-class UnknownOperation(Exception):
-    """Custom Exception for unrecognized operation in a data pipeline."""
-
+class FileValidationError(Exception):
+    """Custom exception raised when file validation fails."""
     pass

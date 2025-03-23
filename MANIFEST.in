@@ -1,2 +1,2 @@
-include data_previews/*
+include data_definition/data_definitions/*
 include contributors/*.md

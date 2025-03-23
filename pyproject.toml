@@ -11,13 +11,25 @@ license = { text = "MIT" }
 requires-python = ">=3.13"
 dependencies = [
     "duckdb>=1.2.0",
-    "kagglehub>=0.3.10",
     "platformdirs>=4.3.6",
+    "pyyaml>=6.0.2",
 ]
 
 [project.scripts]
 disco = "discoanalytica:main"
-disco_hash = "discoanalytica.file_hash:main"
+disco_hash = "discoanalytica.utility.file_hash:main"
+
+[project.optional-dependencies]
+s3 = [
+    "boto3>=1.37.4",
+]
+kaggle = [
+    "kagglehub>=0.3.10",
+]
+http = [
+    "httpx>=0.28.1",
+    "tqdm>=4.67.1",
+]
 
 
 [build-system]
@@ -27,6 +39,6 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/discoanalytica"]
 include = [
-    "discoanalytica/data_definitions/*.json",
+    "discoanalytica/data_definition/data_definitions/*.yaml",
     "discoanalytica/sql/*.sql"
 ]
